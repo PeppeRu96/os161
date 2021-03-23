@@ -273,4 +273,4 @@ toolbuild
 
 root/
 doxygen/
-compile/*
+**/compile/*
