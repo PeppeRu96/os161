@@ -274,8 +274,9 @@ tools/bin/*
 !tools/bin/os161-help
 toolbuild
 
-/root/**
+/root/*
 !/root/.gdbinit
+!/root/sys161.conf
 doxygen/
 **/compile/*
 
