@@ -11,15 +11,15 @@ echo ""
 echo "Build: "
 echo "  To make a new build you have to:
     1- Create a configuration file inside ../kern/conf, usually copying
-       an existing one
+       an existing one, then modify conf.kern
     2- ./config NEWBUILD to generate a NEWBUILD folder inside ../kern/compile
     3- bmake depend, bmake, bmake install from the compile/NEWBUILD folder"
 echo "Debug: "
 echo "  1- From a terminal inside root folder, run: sys161 -w kernel
   2- From another terminal inside root folder, you can run:
-    - cmd gdb: mips-harvard-os161-gdb kernel
-    - gdb with basic gui: mips-harvard-os161-gdb -tui kernel
-    - ddd: ddd --debugger mips-harvard-os161-gdb kernel
+    - mips-harvard-os161-gdb kernel         (basic gdb cmd)
+    - mips-harvard-os161-gdb -tui kernel    (gdb with gui)
+    - ddd --debugger mips-harvard-os161-gdb kernel    (for ddd)
     - emacs:
       - emacs -rv
       - tools->Debugger
@@ -37,3 +37,17 @@ echo "  1- From a terminal inside root folder, run: sys161 -w kernel
   or close the current debugging session and manually call one symbol
   directly from inside gdb command line.
   When the debugger loses the connection, call from gdb cmd  the symbol again."
+echo "Modify the source code: "
+echo "  - All header files are under ../kern/include
+  - All libs are under ../kern/lib
+  - The main sources (main.c, menu.c) are in ../kern/main
+  - All other folders inside ../kern except conf, compile and some others,
+    contain source files for each related functionality (e.g. ../kern/vm
+    for virtual memory functionality)
+  - All the source files to be compiled in the current build are under conf.kern
+    - file myfile.c  - always compile myfile.c
+    - defoption myoption
+      optfile myoption myfile.c
+      It compiles myfile.c only if in the current build configuration file
+      there is 'options myoption'"
+
