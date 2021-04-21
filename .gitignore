@@ -271,6 +271,8 @@ defs.mk
 tools
 toolbuild
 
-root/
+/root/**
+!/root/.gdbinit
 doxygen/
 **/compile/*
+
