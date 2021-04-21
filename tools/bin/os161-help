@@ -1,3 +1,39 @@
 #!/bin/bash
 
 echo "--- OS161 HELP ---"
+echo "Basic folders:"
+echo "  os161/os161-base-2.0.x/ - contains all the source code"
+echo "  os161/os161-base-2.0.x/kern - contains all the kernel stuff"
+echo "  os161/os161-base-2.0.x/kern/conf - contains build configurations"
+echo "  os161/os161-base-2.0.x/kern/compile - contains all stuff generated from
+  the configuration in order to compile and make the build"
+echo ""
+echo "Build: "
+echo "  To make a new build you have to:
+    1- Create a configuration file inside ../kern/conf, usually copying
+       an existing one
+    2- ./config NEWBUILD to generate a NEWBUILD folder inside ../kern/compile
+    3- bmake depend, bmake, bmake install from the compile/NEWBUILD folder"
+echo "Debug: "
+echo "  1- From a terminal inside root folder, run: sys161 -w kernel
+  2- From another terminal inside root folder, you can run:
+    - cmd gdb: mips-harvard-os161-gdb kernel
+    - gdb with basic gui: mips-harvard-os161-gdb -tui kernel
+    - ddd: ddd --debugger mips-harvard-os161-gdb kernel
+    - emacs:
+      - emacs -rv
+      - tools->Debugger
+      - on the cmd: mips-harvard-os161-gdb -i=mi kernel
+
+  In order to debug, we have to execute two commands on gdb:
+    - dir ../os161-base-2.0.3/kern/compile/BUILD_TO_DEBUG
+    - target remote unix:.sockets/gdb
+  To make things easier, we created a file root/.gdbinit that is executed
+  on gdb startup, it's simply a bunch of gdb commands.
+  On this file we define a set of symbols named 'dbos161x',
+  where 'x' is the starting letter of the BUILD_TO_DEBUG (in this case, b).
+  The file sets these symbols and call one of them.
+  To debug a specific version, change the symbol called inside this file,
+  or close the current debugging session and manually call one symbol
+  directly from inside gdb command line.
+  When the debugger loses the connection, call from gdb cmd  the symbol again."
