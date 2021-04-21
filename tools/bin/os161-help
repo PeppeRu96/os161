@@ -7,6 +7,8 @@ echo "  os161/os161-base-2.0.x/kern - contains all the kernel stuff"
 echo "  os161/os161-base-2.0.x/kern/conf - contains build configurations"
 echo "  os161/os161-base-2.0.x/kern/compile - contains all stuff generated from
   the configuration in order to compile and make the build"
+echo "  os161/root/ - contains the executable kernel (sys161 kernel to execute)"
+echo "  os161/root/sys161.conf - contains the mips virtual machine config"
 echo ""
 echo "Build: "
 echo "  To make a new build you have to:
