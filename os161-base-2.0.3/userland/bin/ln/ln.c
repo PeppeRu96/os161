@@ -27,38 +27,67 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYSCALL_H_
-#define _SYSCALL_H_
-
-
-#include <cdefs.h> /* for __DEAD */
-struct trapframe; /* from <machine/trapframe.h> */
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <err.h>
 
 /*
- * The system call dispatcher.
+ * ln - hardlink or symlink files
+ *
+ * Usage: ln oldfile newfile
+ *        ln -s symlinkcontents symlinkfile
  */
-
-void syscall(struct trapframe *tf);
-
-/*
- * Support functions.
- */
-
-/* Helper for fork(). You write this. */
-void enter_forked_process(struct trapframe *tf);
-
-/* Enter user mode. Does not return. */
-__DEAD void enter_new_process(int argc, userptr_t argv, userptr_t env,
-		       vaddr_t stackptr, vaddr_t entrypoint);
 
 
 /*
- * Prototypes for IN-KERNEL entry points for system call implementations.
+ * Create a symlink with filename PATH that contains text TEXT.
+ * When fed to ls -l, this produces something that looks like
+ *
+ * lrwxrwxrwx  [stuff]   PATH -> TEXT
  */
+static
+void
+dosymlink(const char *text, const char *path)
+{
+	if (symlink(text, path)) {
+		err(1, "%s", path);
+	}
+}
 
-int sys_reboot(int code);
-int sys___time(userptr_t user_seconds, userptr_t user_nanoseconds);
-ssize_t sys_read(int filehandle, void *buf, size_t size);
-ssize_t sys_write(int filehandle, const void *buf, size_t size);
+/*
+ * Create a hard link such that NEWFILE names the same file as
+ * OLDFILE. Since it's a hard link, the two names for the file
+ * are equal; both are the "real" file.
+ */
+static
+void
+dohardlink(const char *oldfile, const char *newfile)
+{
+	if (link(oldfile, newfile)) {
+		err(1, "%s or %s", oldfile, newfile);
+		exit(1);
+	}
+}
 
-#endif /* _SYSCALL_H_ */
+int
+main(int argc, char *argv[])
+{
+	/*
+	 * Just do whatever was asked for.
+	 *
+	 * We don't allow the Unix model where you can do
+	 *    ln [-s] file1 file2 file3 destination-directory
+	 */
+	if (argc==4 && !strcmp(argv[1], "-s")) {
+		dosymlink(argv[2], argv[3]);
+	}
+	else if (argc==3) {
+		dohardlink(argv[1], argv[2]);
+	}
+	else {
+		warnx("Usage: ln oldfile newfile");
+		errx(1, "       ln -s symlinkcontents symlinkfile\n");
+	}
+	return 0;
+}
