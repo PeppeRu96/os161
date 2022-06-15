@@ -27,43 +27,36 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYSCALL_H_
-#define _SYSCALL_H_
-
-#include <opt-file_syscalls.h>
-
-
-#include <cdefs.h> /* for __DEAD */
-struct trapframe; /* from <machine/trapframe.h> */
-
 /*
- * The system call dispatcher.
- */
+	Simple echo test to assert read and write system calls working.
+*/
 
-void syscall(struct trapframe *tf);
+#include <stdio.h>
 
-/*
- * Support functions.
- */
+int
+main(void)
+{
+	char echo_buffer[1000];
+	int idx = 0;
+	char c;
 
-/* Helper for fork(). You write this. */
-void enter_forked_process(struct trapframe *tf);
+	printf("Echo test!\n");
 
-/* Enter user mode. Does not return. */
-__DEAD void enter_new_process(int argc, userptr_t argv, userptr_t env,
-		       vaddr_t stackptr, vaddr_t entrypoint);
+	printf("Insert a string (9 to terminate): ");
 
+	
+	while (1) {
+		c = getchar();
+		if (c == EOF || c == '9')
+			break;
 
-/*
- * Prototypes for IN-KERNEL entry points for system call implementations.
- */
+		echo_buffer[idx++] = c;
+	}
 
-int sys_reboot(int code);
-int sys___time(userptr_t user_seconds, userptr_t user_nanoseconds);
+	echo_buffer[idx] = '\n';
+	printf("\nEcho: %s\n", echo_buffer);
 
-#if OPT_FILE_SYSCALLS
-ssize_t sys_read(int filehandle, void *buf, size_t size);
-ssize_t sys_write(int filehandle, const void *buf, size_t size);
-#endif
+	printf("Echo test terminated!\n");
 
-#endif /* _SYSCALL_H_ */
+	return 0;
+}

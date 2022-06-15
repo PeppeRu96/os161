@@ -5,6 +5,10 @@
         "opt-noasserts.h": "c",
         "version.h": "c",
         "unistd.h": "c",
-        "stdarg.h": "c"
+        "stdarg.h": "c",
+        "spinlock.h": "c",
+        "stdio.h": "c",
+        "syscall.h": "c",
+        "current.h": "c"
     }
 }

@@ -278,6 +278,7 @@ toolbuild
 !/root/.gdbinit
 !/root/sys161.conf
 !/os161-base-2.0.3/userland/bin
+!/os161-base-2.0.3/man/bin
 doxygen/
 **/compile/*
 

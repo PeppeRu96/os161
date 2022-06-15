@@ -379,7 +379,11 @@ file      vfs/devnull.c
 file      syscall/loadelf.c
 file      syscall/runprogram.c
 file      syscall/time_syscalls.c
-file      syscall/file_syscalls.c
+
+# Optional system calls
+
+defoption file_syscalls
+optfile     file_syscalls   syscall/file_syscalls.c
 
 #
 # Startup and initialization
@@ -442,6 +446,12 @@ file		test/semunit.c
 file		test/kmalloctest.c
 file		test/fstest.c
 optfile net	test/nettest.c
+
+########################################
+#                                      #
+#            Test optional             #
+#                                      #
+########################################
 
 defoption hello
 optfile hello main/hello.c

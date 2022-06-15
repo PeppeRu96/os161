@@ -11,7 +11,8 @@ MANFILES=\
 	guzzle.html hash.html hog.html huge.html index.html kitchen.html \
 	malloctest.html matmult.html palin.html randcall.html rmdirtest.html \
 	rmtest.html sink.html sort.html sty.html tail.html tictac.html \
-	triplehuge.html triplemat.html triplesort.html userthreads.html
+	triplehuge.html triplemat.html triplesort.html userthreads.html \
+	echo.html
 
 .include "$(TOP)/mk/os161.man.mk"
 

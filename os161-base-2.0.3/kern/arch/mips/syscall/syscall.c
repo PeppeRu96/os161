@@ -36,7 +36,6 @@
 #include <current.h>
 #include <syscall.h>
 
-
 /*
  * System call dispatcher.
  *
@@ -111,6 +110,7 @@ syscall(struct trapframe *tf)
 
 	    /* Add stuff here */
 
+#if OPT_FILE_SYSCALLS
 		case SYS_read:
 		retval = sys_read(tf->tf_a0, (void *)tf->tf_a1, tf->tf_a2);
 		if (retval == -1)
@@ -126,6 +126,7 @@ syscall(struct trapframe *tf)
 		else
 			err = 0;
 		break;
+#endif
 
 	    default:
 		kprintf("Unknown syscall %d\n", callno);
