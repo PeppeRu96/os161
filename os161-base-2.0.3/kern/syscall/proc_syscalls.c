@@ -16,4 +16,6 @@ void sys__exit(int status) {
 
     // Terminate the current thread (actually it goes zombie)
     thread_exit();
+
+    panic("thread_exit returned (should not happen)\n");
 }
