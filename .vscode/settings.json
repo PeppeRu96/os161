@@ -13,6 +13,7 @@
         "types.h": "c",
         "addrspace.h": "c",
         "vm.h": "c",
-        "array": "c"
+        "array": "c",
+        "cpu.h": "c"
     }
 }
