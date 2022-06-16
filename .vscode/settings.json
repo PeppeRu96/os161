@@ -14,6 +14,7 @@
         "addrspace.h": "c",
         "vm.h": "c",
         "array": "c",
-        "cpu.h": "c"
+        "cpu.h": "c",
+        "random": "c"
     }
 }

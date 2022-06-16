@@ -129,6 +129,22 @@ syscall(struct trapframe *tf)
 #endif
 
 #if OPT_PROC_SYSCALLS
+		case SYS_getpid:
+		retval = sys_getpid(curproc);
+		if (retval < 1)
+			err = retval;
+		else
+			err = 0;
+		break;
+
+		case SYS_waitpid:
+		retval = sys_waitpid((pid_t)tf->tf_a0, (int *)tf->tf_a1, (int)tf->tf_a2);
+		if (retval < 1)
+			err = retval;
+		else
+			err = 0;
+		break;
+
 		case SYS__exit:
 		sys__exit(tf->tf_a0);
 		err = ENOSYS;

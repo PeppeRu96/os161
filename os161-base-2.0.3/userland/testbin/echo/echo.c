@@ -42,12 +42,14 @@ main(void)
 
 	printf("Echo test!\n");
 
-	printf("Insert a string (9 to terminate): ");
+	printf("Insert a string (enter to terminate): ");
 
 	
 	while (1) {
 		c = getchar();
-		if (c == EOF || c == '9')
+		putchar(c);
+		// printf("%d", (unsigned int)c);
+		if (c == EOF || c < 14)
 			break;
 
 		echo_buffer[idx++] = c;

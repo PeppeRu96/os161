@@ -37,6 +37,10 @@
 #include <cdefs.h> /* for __DEAD */
 struct trapframe; /* from <machine/trapframe.h> */
 
+#if OPT_PROC_SYSCALLS
+struct proc;
+#endif
+
 /*
  * The system call dispatcher.
  */
@@ -68,6 +72,8 @@ ssize_t sys_write(int filehandle, const void *buf, size_t size);
 #endif
 
 #if OPT_PROC_SYSCALLS
+pid_t sys_getpid(struct proc *p);
+pid_t sys_waitpid(pid_t pid, int *returncode, int flags); 
 void sys__exit(int status);
 #endif
 

@@ -49,10 +49,22 @@
 #include <addrspace.h>
 #include <vnode.h>
 
+
+
 /*
  * The process for the kernel; this holds all the kernel-only threads.
  */
 struct proc *kproc;
+
+#if OPT_PROC_SYSCALLS
+#define MAX_PROCESSES 100
+
+/*
+ * Process table
+ */
+struct proc *proc_table[MAX_PROCESSES];
+struct spinlock proc_table_splk;
+#endif
 
 /*
  * Create a proc structure.
@@ -82,8 +94,81 @@ proc_create(const char *name)
 	/* VFS fields */
 	proc->p_cwd = NULL;
 
+#if OPT_PROC_SYSCALLS
+	proc->proc_state = PROC_STATUS_RUNNING;
+
+	proc->p_cv = cv_create(name);
+	if (proc->p_cv == NULL) {
+		kfree(proc->p_name);
+		kfree(proc);
+		return NULL;
+	}
+
+	proc->p_state_lk = lock_create(name);
+	if (proc->p_state_lk == NULL) {
+		kfree(proc->p_cv);
+		kfree(proc->p_name);
+		kfree(proc);
+		return NULL;
+	}
+
+	/* Search the first available PID */
+	pid_t pid = -1;
+	int i;
+
+	spinlock_acquire(&proc_table_splk);
+	for (i=0; i < MAX_PROCESSES; i++) {
+		if (proc_table[i] == NULL) {
+			pid = (pid_t)i;
+			break;
+		}
+	}
+	spinlock_release(&proc_table_splk);
+
+	if (pid < 0) {
+		kfree(proc->p_cv);
+		kfree(proc->p_state_lk);
+		kfree(proc->p_name);
+		kfree(proc);
+		return NULL;
+	}
+	proc->pid = pid;
+	proc_table[pid] = proc;
+
+#endif
+
 	return proc;
 }
+
+#if OPT_PROC_SYSCALLS
+/*
+ * Wait synchronously for a process to terminate
+ */
+int proc_wait(struct proc *p) {
+	int ret_status;
+	lock_acquire(p->p_state_lk);
+	while (p->proc_state == PROC_STATUS_RUNNING) {
+		cv_wait(p->p_cv, p->p_state_lk);
+	}
+	ret_status = p->exit_status;
+	p->proc_state = PROC_STATUS_TERMINATED;
+	lock_release(p->p_state_lk);
+
+	proc_destroy(p);
+
+	return ret_status;
+}
+
+pid_t proc_getpid(struct proc *p) {
+	return p->pid;
+}
+
+struct proc* proc_from_pid(pid_t pid) {
+	KASSERT(pid >= 0 && pid < MAX_PROCESSES);
+	return proc_table[pid];
+}
+
+#endif
 
 /*
  * Destroy a proc structure.
@@ -166,9 +251,18 @@ proc_destroy(struct proc *proc)
 	}
 
 	KASSERT(proc->p_numthreads == 0);
+#if OPT_PROC_SYSCALLS
+	cv_destroy(proc->p_cv);
+	lock_destroy(proc->p_state_lk);
+
+	proc_table[proc->pid] = NULL;
+#endif
+
 	spinlock_cleanup(&proc->p_lock);
 
+
 	kfree(proc->p_name);
+
 	kfree(proc);
 }
 
@@ -178,6 +272,14 @@ proc_destroy(struct proc *proc)
 void
 proc_bootstrap(void)
 {
+#if OPT_PROC_SYSCALLS
+	int i;
+	for (i=0; i<MAX_PROCESSES; i++)
+		proc_table[i] = NULL;
+
+	spinlock_init(&proc_table_splk);
+#endif
+
 	kproc = proc_create("[kernel]");
 	if (kproc == NULL) {
 		panic("proc_create for kproc failed\n");
@@ -262,6 +364,17 @@ proc_remthread(struct thread *t)
 {
 	struct proc *proc;
 	int spl;
+
+#if OPT_PROC_SYSCALLS
+	/* Check if the thread has already been detached. */
+	int r = 0;
+	spl = splhigh();
+	if (t->t_proc == NULL)
+		r = 1;
+	splx(spl);
+	if (r)
+		return;
+#endif
 
 	proc = t->t_proc;
 	KASSERT(proc != NULL);

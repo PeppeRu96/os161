@@ -37,6 +37,14 @@
  */
 
 #include <spinlock.h>
+#include <synch.h>
+#include <opt-proc_syscalls.h>
+
+#if OPT_PROC_SYSCALLS
+	#define PROC_STATUS_RUNNING 1
+	#define PROC_STATUS_ZOMBIE 2
+	#define PROC_STATUS_TERMINATED 3
+#endif
 
 struct addrspace;
 struct thread;
@@ -70,6 +78,15 @@ struct proc {
 	/* VFS */
 	struct vnode *p_cwd;		/* current working directory */
 
+#if OPT_PROC_SYSCALLS
+	pid_t pid;
+	int exit_status;			/* State to return with _exit */
+	int proc_state;				/* Define the process current status */
+
+	struct cv *p_cv;				/* Condition-variable to wait on the process state */
+	struct lock *p_state_lk;		/* Lock to use with p_cv to protect process state */
+#endif
+
 	/* add more material here as needed */
 };
 
@@ -81,6 +98,15 @@ void proc_bootstrap(void);
 
 /* Create a fresh process for use by runprogram(). */
 struct proc *proc_create_runprogram(const char *name);
+
+#if OPT_PROC_SYSCALLS
+/* Wait a process. */
+int proc_wait(struct proc *p);
+
+pid_t proc_getpid(struct proc *p);
+
+struct proc* proc_from_pid(pid_t pid);
+#endif
 
 /* Destroy a process. */
 void proc_destroy(struct proc *proc);

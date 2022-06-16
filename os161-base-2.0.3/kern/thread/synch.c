@@ -47,19 +47,19 @@
 struct semaphore *
 sem_create(const char *name, unsigned initial_count)
 {
-        struct semaphore *sem;
+	struct semaphore *sem;
 
-        sem = kmalloc(sizeof(*sem));
-        if (sem == NULL) {
-                return NULL;
-        }
+	sem = kmalloc(sizeof(*sem));
+	if (sem == NULL) {
+			return NULL;
+	}
 
-        sem->sem_name = kstrdup(name);
-        if (sem->sem_name == NULL) {
-                kfree(sem);
-                return NULL;
-        }
-
+	sem->sem_name = kstrdup(name);
+	if (sem->sem_name == NULL) {
+			kfree(sem);
+			return NULL;
+	}
+	
 	sem->sem_wchan = wchan_create(sem->sem_name);
 	if (sem->sem_wchan == NULL) {
 		kfree(sem->sem_name);
@@ -141,37 +141,43 @@ V(struct semaphore *sem)
 struct lock *
 lock_create(const char *name)
 {
-        struct lock *lock;
+	struct lock *lock;
 
-        lock = kmalloc(sizeof(*lock));
-        if (lock == NULL) {
-                return NULL;
-        }
+	lock = kmalloc(sizeof(*lock));
+	if (lock == NULL) {
+			return NULL;
+	}
 
-        lock->lk_name = kstrdup(name);
-        if (lock->lk_name == NULL) {
-                kfree(lock);
-                return NULL;
-        }
+	lock->lk_name = kstrdup(name);
+	if (lock->lk_name == NULL) {
+			kfree(lock);
+			return NULL;
+	}
 
-        // add stuff here as needed
+	// add stuff here as needed
 
 #if OPT_SYNCH
 #if USE_SEMAPHORE_FOR_LOCK
-        lock->lk_sem = sem_create(lock->lk_name,1);
+
+	lock->lk_sem = sem_create(name, 1);
 	if (lock->lk_sem == NULL) {
+		kfree(lock->lk_name);
+		kfree(lock);
+		return NULL;
+	}
 #else
 	lock->lk_wchan = wchan_create(lock->lk_name);
 	if (lock->lk_wchan == NULL) {
-#endif
-	  kfree(lock->lk_name);
-	  kfree(lock);
-	  return NULL;
+		kfree(lock->lk_name);
+		kfree(lock);
+		return NULL;
 	}
+#endif
+
 	lock->lk_owner = NULL;
 	spinlock_init(&lock->lk_lock);
 #endif	
-        return lock;
+	return lock;
 }
 
 void
@@ -283,30 +289,30 @@ lock_do_i_hold(struct lock *lock)
 struct cv *
 cv_create(const char *name)
 {
-        struct cv *cv;
+	struct cv *cv;
 
-        cv = kmalloc(sizeof(*cv));
-        if (cv == NULL) {
-                return NULL;
-        }
+	cv = kmalloc(sizeof(*cv));
+	if (cv == NULL) {
+			return NULL;
+	}
 
-        cv->cv_name = kstrdup(name);
-        if (cv->cv_name==NULL) {
-                kfree(cv);
-                return NULL;
-        }
+	cv->cv_name = kstrdup(name);
+	if (cv->cv_name==NULL) {
+			kfree(cv);
+			return NULL;
+	}
 
-        // add stuff here as needed
+	// add stuff here as needed
 #if OPT_SYNCH
 	cv->cv_wchan = wchan_create(cv->cv_name);
 	if (cv->cv_wchan == NULL) {
-	        kfree(cv->cv_name);
+		kfree(cv->cv_name);
 		kfree(cv);
 		return NULL;
 	}
-        spinlock_init(&cv->cv_lock);
+	spinlock_init(&cv->cv_lock);
 #endif
-        return cv;
+	return cv;
 }
 
 void

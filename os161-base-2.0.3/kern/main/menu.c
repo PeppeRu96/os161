@@ -116,6 +116,11 @@ common_prog(int nargs, char **args)
 {
 	struct proc *proc;
 	int result;
+#if OPT_PROC_SYSCALLS
+	int wait_res;
+	int exit_code;
+	pid_t pid;
+#endif
 
 	/* Create a process for the new program to run in. */
 	proc = proc_create_runprogram(args[0] /* name */);
@@ -132,6 +137,15 @@ common_prog(int nargs, char **args)
 		proc_destroy(proc);
 		return result;
 	}
+#if OPT_PROC_SYSCALLS
+	pid = sys_getpid(proc);
+	wait_res = sys_waitpid(pid, &exit_code, 0);
+	if (wait_res < 0)
+		kprintf("Error during waitpid - error code: %d", wait_res);
+	else
+		kprintf("Exit code of user process (PID: %d): %d\n", pid, exit_code);
+#endif
+
 
 	/*
 	 * The new process will be destroyed when the program exits...
