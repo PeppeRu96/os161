@@ -31,7 +31,7 @@ ssize_t sys_write(int filehandle, const void *buf, size_t size)
     size_t i;
     const char *char_buf = (const char *)buf;
     
-    if (filehandle != STDOUT_FILENO && fd != STDERR_FILENO) {
+    if (filehandle != STDOUT_FILENO && filehandle != STDERR_FILENO) {
         kprintf("sys_write supported only to stdout\n");
         return -1;
     }

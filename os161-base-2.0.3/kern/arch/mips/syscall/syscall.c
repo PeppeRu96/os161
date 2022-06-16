@@ -131,7 +131,7 @@ syscall(struct trapframe *tf)
 #if OPT_PROC_SYSCALLS
 		case SYS__exit:
 		sys__exit(tf->tf_a0);
-
+		err = ENOSYS;
 		break;
 #endif
 
