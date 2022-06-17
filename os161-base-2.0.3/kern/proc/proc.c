@@ -137,6 +137,12 @@ proc_create(const char *name)
 
 #endif
 
+#if OPT_FILE_SYSCALLS
+	int j;
+	for (j=0; j<OPEN_MAX; j++)
+		proc->p_openfiles[j] = NULL;
+#endif
+
 	return proc;
 }
 

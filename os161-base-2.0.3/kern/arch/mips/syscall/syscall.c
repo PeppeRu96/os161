@@ -136,7 +136,7 @@ syscall(struct trapframe *tf)
 		break;
 
 		case SYS_write:
-		retval = sys_write((int)tf->tf_a0, (const_userptr_t)tf->tf_a1, (size_t)tf->tf_a2);
+		retval = sys_write((int)tf->tf_a0, (userptr_t)tf->tf_a1, (size_t)tf->tf_a2);
 		if (retval < 0)
 			err = ENOSYS;
 		else

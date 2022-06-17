@@ -110,14 +110,13 @@ ssize_t sys_read(int fd, userptr_t buf, size_t size)
     char *char_buf = (char *)buf;
     
     if (fd == STDOUT_FILENO || fd == STDERR_FILENO) {
-        kprintf("Cannot read from STDOUT/STDERR!\n");
         return -1;
     }
 
     of = curproc->p_openfiles[fd];
 
     /* Standard input (console) in use */
-    if ((of == NULL || of->vn == NULL) && (fd == STDOUT_FILENO || fd == STDERR_FILENO)) {
+    if ((of == NULL || of->vn == NULL) && (fd == STDIN_FILENO)) {
         for (pos=0; pos<size; pos++) {
             ch = getch();
 
@@ -132,7 +131,6 @@ ssize_t sys_read(int fd, userptr_t buf, size_t size)
 
     /* Read from file (either native or stdout/err redirected into a file) */
     if (of == NULL || of->vn == NULL) {
-        kprintf("Attempt to write to a not opened file!\n");
         return -1;
     }
 
@@ -173,7 +171,6 @@ ssize_t sys_write(int fd, const_userptr_t buf, size_t size)
     const char *char_buf = (const char *)buf;
     
     if (fd == STDIN_FILENO) {
-        kprintf("Cannot write in the STDIN!\n");
         return -1;
     }
 
@@ -190,7 +187,6 @@ ssize_t sys_write(int fd, const_userptr_t buf, size_t size)
 
     /* Write into a file (either native or stdout/err redirected into a file) */
     if (of == NULL || of->vn == NULL) {
-        kprintf("Attempt to write to a not opened file!\n");
         return -1;
     }
 
