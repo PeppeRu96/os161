@@ -37,10 +37,6 @@
 #include <cdefs.h> /* for __DEAD */
 struct trapframe; /* from <machine/trapframe.h> */
 
-#if OPT_PROC_SYSCALLS
-struct proc;
-#endif
-
 /*
  * The system call dispatcher.
  */
@@ -67,11 +63,18 @@ int sys_reboot(int code);
 int sys___time(userptr_t user_seconds, userptr_t user_nanoseconds);
 
 #if OPT_FILE_SYSCALLS
-ssize_t sys_read(int filehandle, void *buf, size_t size);
-ssize_t sys_write(int filehandle, const void *buf, size_t size);
+
+struct openfile;
+
+int sys_open(const char *pathname, int flags, mode_t mode);
+int sys_close(int fd);
+ssize_t sys_read(int fd, userptr_t buf, size_t size);
+ssize_t sys_write(int fd, const_userptr_t buf, size_t size);
 #endif
 
 #if OPT_PROC_SYSCALLS
+struct proc;
+
 pid_t sys_getpid(struct proc *p);
 pid_t sys_waitpid(pid_t pid, int *returncode, int flags); 
 void sys__exit(int status);

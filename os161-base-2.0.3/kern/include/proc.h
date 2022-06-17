@@ -38,7 +38,9 @@
 
 #include <spinlock.h>
 #include <synch.h>
+#include <limits.h>
 #include <opt-proc_syscalls.h>
+#include <opt-file_syscalls.h>
 
 #if OPT_PROC_SYSCALLS
 	#define PROC_STATUS_RUNNING 1
@@ -85,6 +87,10 @@ struct proc {
 
 	struct cv *p_cv;				/* Condition-variable to wait on the process state */
 	struct lock *p_state_lk;		/* Lock to use with p_cv to protect process state */
+#endif
+
+#if OPT_FILE_SYSCALLS
+	struct openfile *p_openfiles[OPEN_MAX];
 #endif
 
 	/* add more material here as needed */

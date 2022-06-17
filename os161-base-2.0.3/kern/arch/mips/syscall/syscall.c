@@ -111,8 +111,24 @@ syscall(struct trapframe *tf)
 	    /* Add stuff here */
 
 #if OPT_FILE_SYSCALLS
+		case SYS_open:
+		retval = sys_open((const char *)tf->tf_a0, (int)tf->tf_a1, (mode_t)tf->tf_a2);
+		if (retval < 0)
+			err = ENOSYS;
+		else
+			err = 0;
+		break;
+
+		case SYS_close:
+		retval = sys_close((int)tf->tf_a0);
+		if (retval < 0)
+			err = ENOSYS;
+		else
+			err = 0;
+		break;
+
 		case SYS_read:
-		retval = sys_read(tf->tf_a0, (void *)tf->tf_a1, tf->tf_a2);
+		retval = sys_read((int)tf->tf_a0, (userptr_t)tf->tf_a1, (size_t)tf->tf_a2);
 		if (retval < 0)
 			err = ENOSYS;
 		else
@@ -120,7 +136,7 @@ syscall(struct trapframe *tf)
 		break;
 
 		case SYS_write:
-		retval = sys_write(tf->tf_a0, (void *)tf->tf_a1, tf->tf_a2);
+		retval = sys_write((int)tf->tf_a0, (const_userptr_t)tf->tf_a1, (size_t)tf->tf_a2);
 		if (retval < 0)
 			err = ENOSYS;
 		else

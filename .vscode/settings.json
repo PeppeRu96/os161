@@ -15,6 +15,9 @@
         "vm.h": "c",
         "array": "c",
         "cpu.h": "c",
-        "random": "c"
+        "random": "c",
+        "vnode.h": "c",
+        "typeinfo": "c",
+        "functional": "c"
     }
 }
